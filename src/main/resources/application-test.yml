@@ -1,0 +1,17 @@
+spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: pediasaas
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    create-schemas: true
+    schemas: pediasaas
+    default-schema: pediasaas
+    locations: classpath:db/migration
