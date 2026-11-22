@@ -24,11 +24,11 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Utilisateur extends BaseEntity {
 
-    @Column(name = "entreprise_uuid", nullable = false)
+    @Column(name = "entreprise_uuid")
     private UUID entrepriseUuid;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @Column(name = "nom", nullable = false, length = 100)
