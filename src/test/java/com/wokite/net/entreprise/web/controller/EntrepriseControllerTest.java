@@ -6,6 +6,7 @@ import com.wokite.net.entreprise.application.dto.EntrepriseResponse;
 import com.wokite.net.entreprise.application.service.EntrepriseService;
 import com.wokite.net.entreprise.domain.model.TypeEntreprise;
 import com.wokite.net.shared.persistence.RecordStatus;
+import com.wokite.net.shared.security.JwtService;
 import com.wokite.net.shared.security.SecurityConfig;
 import com.wokite.net.shared.web.error.GlobalExceptionHandler;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,9 @@ class EntrepriseControllerTest {
 
     @MockitoBean
     private EntrepriseService entrepriseService;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     @Test
     @WithMockUser

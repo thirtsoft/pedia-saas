@@ -1,4 +1,4 @@
-package com.wokite.net.utilisateur.application.dto;
+package com.wokite.net.utilisateur.auth.dto;
 
 import com.wokite.net.shared.persistence.RecordStatus;
 import com.wokite.net.utilisateur.domain.model.ProviderAuthentification;

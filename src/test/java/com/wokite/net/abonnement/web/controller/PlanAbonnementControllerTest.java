@@ -3,6 +3,7 @@ package com.wokite.net.abonnement.web.controller;
 import com.wokite.net.abonnement.application.dto.PlanAbonnementResponse;
 import com.wokite.net.abonnement.application.service.PlanAbonnementService;
 import com.wokite.net.shared.persistence.RecordStatus;
+import com.wokite.net.shared.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,6 +27,9 @@ class PlanAbonnementControllerTest {
 
     @MockitoBean
     PlanAbonnementService service;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     @Test
     @WithMockUser

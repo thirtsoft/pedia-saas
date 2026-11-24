@@ -81,13 +81,13 @@ CREATE INDEX idx_utilisateur_entreprise_uuid ON utilisateur (entreprise_uuid);
 CREATE INDEX idx_utilisateur_role_id ON utilisateur (role_id);
 CREATE INDEX idx_utilisateur_nom_prenom ON utilisateur (nom, prenom);
 INSERT INTO role(id, uuid, code, libelle, created_at, updated_at, record_status, version)
-VALUES (nextval('wokite_sequence'), gen_random_uuid(), 'ADMIN_CABINET', 'Administrateur du cabinet', CURRENT_TIMESTAMP,
+VALUES (nextval('wokite_sequence'), '11111111-1111-1111-1111-000000000001', 'ADMIN_CABINET', 'Administrateur du cabinet', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP, 'ACTIVE', 0),
-       (nextval('wokite_sequence'), gen_random_uuid(), 'MEDECIN', 'Médecin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+       (nextval('wokite_sequence'), '11111111-1111-1111-1111-000000000002', 'MEDECIN', 'Médecin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
         'ACTIVE', 0),
-       (nextval('wokite_sequence'), gen_random_uuid(), 'SECRETAIRE', 'Secrétaire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+       (nextval('wokite_sequence'), '11111111-1111-1111-1111-000000000003', 'SECRETAIRE', 'Secrétaire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
         'ACTIVE', 0),
-       (nextval('wokite_sequence'), gen_random_uuid(), 'COMPTABLE', 'Comptable', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+       (nextval('wokite_sequence'), '11111111-1111-1111-1111-000000000004', 'COMPTABLE', 'Comptable', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
         'ACTIVE', 0),
-       (nextval('wokite_sequence'), gen_random_uuid(), 'MEDECIN_INDEPENDANT', 'Médecin indépendant', CURRENT_TIMESTAMP,
+       (nextval('wokite_sequence'), '11111111-1111-1111-1111-000000000005', 'MEDECIN_INDEPENDANT', 'Médecin indépendant', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP, 'ACTIVE', 0);

@@ -1,7 +1,9 @@
 package com.wokite.net.utilisateur.auth;
 
-import com.wokite.net.utilisateur.application.dto.InscriptionResponse;
-import com.wokite.net.utilisateur.application.dto.InscrireUtilisateurRequest;
+import com.wokite.net.utilisateur.auth.dto.InscriptionResponse;
+import com.wokite.net.utilisateur.auth.dto.InscrireUtilisateurRequest;
+import com.wokite.net.utilisateur.auth.dto.LoginRequest;
+import com.wokite.net.utilisateur.auth.dto.LoginResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,12 @@ public class AuthentificationController {
 
     @PostMapping("/register")
     public ResponseEntity<InscriptionResponse> inscrire(@Valid @RequestBody InscrireUtilisateurRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.inscrire(request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.inscrire(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(service.login(request));
     }
 }

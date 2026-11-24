@@ -1,3 +1,9 @@
--- Foundation migration.
--- Flyway creates the configured schema before executing this migration.
-SELECT 1;
+-- ============================================================
+-- pediaSaaS
+-- Foundation migration
+-- ============================================================
+
+CREATE SCHEMA IF NOT EXISTS pediasaas;
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto
+    WITH SCHEMA pediasaas;

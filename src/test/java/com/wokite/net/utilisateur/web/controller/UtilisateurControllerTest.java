@@ -2,6 +2,7 @@ package com.wokite.net.utilisateur.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wokite.net.shared.persistence.RecordStatus;
+import com.wokite.net.shared.security.JwtService;
 import com.wokite.net.shared.security.SecurityConfig;
 import com.wokite.net.shared.web.error.GlobalExceptionHandler;
 import com.wokite.net.utilisateur.application.dto.CreerUtilisateurRequest;
@@ -37,6 +38,9 @@ class UtilisateurControllerTest {
 
     @MockitoBean
     UtilisateurService service;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     @Test
     @WithMockUser
