@@ -14,4 +14,12 @@ public record AuthenticatedUser(
         OnboardingStatus onboardingStatus,
         OnboardingStepCode onboardingStep
 ) {
+    public AuthenticatedUser {
+        permissions = permissions == null ? Set.of() : Set.copyOf(permissions);
+    }
+
+    @Override
+    public Set<String> permissions() {
+        return Set.copyOf(permissions);
+    }
 }

@@ -1,6 +1,7 @@
 package com.wokite.net.abonnement.domain.repository;
 
 import com.wokite.net.abonnement.domain.model.PlanAbonnement;
+import com.wokite.net.shared.persistence.RecordStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,4 +15,8 @@ public interface PlanAbonnementRepository extends JpaRepository<PlanAbonnement, 
     boolean existsByCodeIgnoreCase(String code);
 
     List<PlanAbonnement> findAllByActifTrueOrderByPrixMensuelAsc();
+
+    List<PlanAbonnement> findByActifTrueAndRecordStatusOrderByIdAsc(RecordStatus recordStatus);
+
+    boolean existsByUuid(UUID uuid);
 }

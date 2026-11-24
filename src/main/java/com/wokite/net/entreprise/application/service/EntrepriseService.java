@@ -4,6 +4,7 @@ import com.wokite.net.entreprise.application.dto.CreerEntrepriseRequest;
 import com.wokite.net.entreprise.application.dto.EntrepriseResponse;
 import com.wokite.net.entreprise.domain.exception.EntrepriseCodeAlreadyExistsException;
 import com.wokite.net.entreprise.domain.model.Entreprise;
+import com.wokite.net.entreprise.domain.model.TypeEntreprise;
 import com.wokite.net.entreprise.domain.repository.EntrepriseRepository;
 import com.wokite.net.shared.persistence.RecordStatus;
 import com.wokite.net.shared.web.error.ResourceNotFoundException;
@@ -32,6 +33,7 @@ public class EntrepriseService {
         }
 
         Entreprise entreprise = new Entreprise();
+
         entreprise.setCode(code);
         entreprise.setNom(request.nom().trim());
         entreprise.setType(request.type());
@@ -45,10 +47,48 @@ public class EntrepriseService {
         return toResponse(saved);
     }
 
+    @Transactional
+    public EntrepriseResponse creerDepuisOnboarding(
+            String nom,
+            String telephone,
+            String email,
+            String adresse,
+            String type) {
+
+        TypeEntreprise typeEntreprise;
+
+        try {
+            typeEntreprise = TypeEntreprise.valueOf(type);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException(
+                    "Type d'entreprise invalide."
+            );
+        }
+
+        String code = genererCode();
+
+        while (entrepriseRepository.existsByCodeIgnoreCase(code)) {
+            code = genererCode();
+        }
+
+        Entreprise entreprise = new Entreprise();
+
+        entreprise.setCode(code);
+        entreprise.setNom(nom.trim());
+        entreprise.setType(typeEntreprise);
+        entreprise.setEmail(normaliserNullable(email));
+        entreprise.setTelephone(normaliserNullable(telephone));
+        entreprise.setAdresse(normaliserNullable(adresse));
+        entreprise.setRecordStatus(RecordStatus.ACTIVE);
+
+        Entreprise saved = entrepriseRepository.saveAndFlush(entreprise);
+
+        return toResponse(saved);
+    }
+
     public EntrepriseResponse rechercherParUuid(UUID uuid) {
-        Entreprise entreprise = entrepriseRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Entreprise introuvable."
+        Entreprise entreprise = entrepriseRepository.findByUuid(uuid).orElseThrow(() ->
+                new ResourceNotFoundException("Entreprise introuvable."
                 ));
 
         return toResponse(entreprise);
@@ -69,6 +109,11 @@ public class EntrepriseService {
         );
     }
 
+    private String genererCode() {
+        String suffixe = UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase(Locale.ROOT);
+        return "PED-" + suffixe;
+    }
+
     private String normaliserCode(String code) {
         return code.trim().toUpperCase(Locale.ROOT);
     }
@@ -80,6 +125,4 @@ public class EntrepriseService {
         String normalized = value.trim();
         return normalized.isBlank() ? null : normalized;
     }
-
-
 }

@@ -14,6 +14,7 @@ import com.wokite.net.utilisateur.domain.repository.RoleRepository;
 import com.wokite.net.utilisateur.domain.repository.UtilisateurRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -32,15 +33,22 @@ public class UtilisateurService {
     }
 
     public UtilisateurResponse creer(CreerUtilisateurRequest r) {
+
         String email = norm(r.email());
+
         if (users.existsByEmailIgnoreCase(email)) {
             throw new UtilisateurEmailAlreadyExistsException(email);
         }
+
         Role role = findRole(r.roleUuid());
-        ProviderAuthentification p = r.providerAuthentification() == null ? ProviderAuthentification.LOCAL : r.providerAuthentification();
+
+        ProviderAuthentification p = r.providerAuthentification() == null
+                ? ProviderAuthentification.LOCAL : r.providerAuthentification();
+
         if (p == ProviderAuthentification.LOCAL && r.motDePasse() == null) {
             throw new MotDePasseObligatoireException();
         }
+
         Utilisateur u = new Utilisateur();
         u.setEntrepriseUuid(r.entrepriseUuid());
         u.setRole(role);
@@ -49,9 +57,11 @@ public class UtilisateurService {
         u.setEmail(email);
         u.setProviderAuthentification(p);
         u.setRecordStatus(RecordStatus.ACTIVE);
+
         if (p == ProviderAuthentification.LOCAL) {
             u.setMotDePasse(encoder.encode(r.motDePasse()));
         }
+
         return toResponse(users.save(u));
     }
 
@@ -61,10 +71,12 @@ public class UtilisateurService {
         if (users.existsByEmailIgnoreCaseAndUuidNot(email, id)) {
             throw new UtilisateurEmailAlreadyExistsException(email);
         }
+
         u.setRole(findRole(r.roleUuid()));
         u.setNom(r.nom().trim());
         u.setPrenom(r.prenom().trim());
         u.setEmail(email);
+
         return toResponse(u);
     }
 
@@ -72,16 +84,35 @@ public class UtilisateurService {
         return toResponse(find(id));
     }
 
+    @Transactional
+    public void rattacherEntreprise(UUID utilisateurUuid, UUID entrepriseUuid) {
+        Utilisateur utilisateur = find(utilisateurUuid);
+        utilisateur.setEntrepriseUuid(entrepriseUuid);
+        users.save(utilisateur);
+    }
+
+    @Transactional
+    public void affecterRole(UUID utilisateurUuid, UUID roleUuid) {
+        Utilisateur utilisateur = find(utilisateurUuid);
+        utilisateur.setRole(findRole(roleUuid));
+    }
+
     public void desactiver(UUID id) {
         find(id).setRecordStatus(RecordStatus.INACTIVE);
     }
 
     private Utilisateur find(UUID id) {
-        return users.findByUuid(id).orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable."));
+        return users.findByUuid(id).orElseThrow(() ->
+                new ResourceNotFoundException(
+                        "Utilisateur introuvable."
+                ));
     }
 
     private Role findRole(UUID id) {
-        return roles.findByUuid(id).orElseThrow(() -> new ResourceNotFoundException("Rôle introuvable."));
+        return roles.findByUuid(id).orElseThrow(() ->
+                new ResourceNotFoundException(
+                        "Rôle introuvable."
+                ));
     }
 
     private String norm(String v) {
@@ -89,6 +120,18 @@ public class UtilisateurService {
     }
 
     private UtilisateurResponse toResponse(Utilisateur u) {
-        return new UtilisateurResponse(u.getUuid(), u.getEntrepriseUuid(), u.getRole().getUuid(), u.getRole().getCode(), u.getNom(), u.getPrenom(), u.getEmail(), u.getProviderAuthentification(), u.getRecordStatus(), u.getCreatedAt(), u.getUpdatedAt());
+        return new UtilisateurResponse(
+                u.getUuid(),
+                u.getEntrepriseUuid(),
+                u.getRole().getUuid(),
+                u.getRole().getCode(),
+                u.getNom(),
+                u.getPrenom(),
+                u.getEmail(),
+                u.getProviderAuthentification(),
+                u.getRecordStatus(),
+                u.getCreatedAt(),
+                u.getUpdatedAt()
+        );
     }
 }

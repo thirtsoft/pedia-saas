@@ -4,17 +4,25 @@ import com.wokite.net.shared.persistence.RecordStatus;
 import com.wokite.net.shared.web.error.ResourceNotFoundException;
 import com.wokite.net.utilisateur.application.dto.CreerRoleRequest;
 import com.wokite.net.utilisateur.application.dto.ModifierRoleRequest;
+import com.wokite.net.utilisateur.application.dto.RoleOnboardingResponse;
 import com.wokite.net.utilisateur.application.dto.RoleResponse;
 import com.wokite.net.utilisateur.domain.exception.RoleCodeAlreadyExistsException;
 import com.wokite.net.utilisateur.domain.model.Role;
+import com.wokite.net.utilisateur.domain.model.RoleCode;
 import com.wokite.net.utilisateur.domain.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 @Service
 public class RoleService {
+
+    private static final List<String> CODES_ROLES_ONBOARDING = List.of(
+            RoleCode.MEDECIN_INDEPENDANT.name(),
+            RoleCode.ADMIN_CABINET.name()
+    );
 
     private final RoleRepository repository;
 
@@ -50,6 +58,18 @@ public class RoleService {
 
     private Role find(UUID u) {
         return repository.findByUuid(u).orElseThrow(() -> new ResourceNotFoundException("Rôle introuvable."));
+    }
+
+    public List<RoleOnboardingResponse> rechercherRolesDisponiblesPourOnboarding() {
+        return repository
+                .findRolesDisponiblesPourOnboarding(CODES_ROLES_ONBOARDING, RecordStatus.ACTIVE)
+                .stream()
+                .map(this::toOnboardingResponse)
+                .toList();
+    }
+
+    private RoleOnboardingResponse toOnboardingResponse(Role role) {
+        return new RoleOnboardingResponse(role.getUuid(), role.getCode(), role.getLibelle());
     }
 
     private RoleResponse toResponse(Role e) {

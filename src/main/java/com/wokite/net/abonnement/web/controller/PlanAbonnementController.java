@@ -2,10 +2,12 @@ package com.wokite.net.abonnement.web.controller;
 
 import com.wokite.net.abonnement.application.dto.CreerPlanAbonnementRequest;
 import com.wokite.net.abonnement.application.dto.ModifierPlanAbonnementRequest;
+import com.wokite.net.abonnement.application.dto.PlanAbonnementOnbordingResponse;
 import com.wokite.net.abonnement.application.dto.PlanAbonnementResponse;
 import com.wokite.net.abonnement.application.service.PlanAbonnementService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,8 +47,13 @@ public class PlanAbonnementController {
     }
 
     @PutMapping("/{uuid}")
-    public PlanAbonnementResponse modifier(@PathVariable UUID uuid,
-                                           @Valid @RequestBody ModifierPlanAbonnementRequest request) {
+    public PlanAbonnementResponse modifier(@PathVariable UUID uuid, @Valid @RequestBody ModifierPlanAbonnementRequest request) {
         return service.modifier(uuid, request);
     }
+
+    @GetMapping
+    public ResponseEntity<List<PlanAbonnementOnbordingResponse>> rechercherPlansDisponibles() {
+        return ResponseEntity.ok(service.rechercherPlansDisponibles());
+    }
+
 }

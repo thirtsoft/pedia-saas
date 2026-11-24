@@ -37,6 +37,24 @@ public class Onboarding extends BaseEntity {
     @Column(name = "utilisateur_uuid", nullable = false, updatable = false)
     private UUID utilisateurUuid;
 
+    @Column(name = "role_uuid")
+    private UUID roleUuid;
+
+    @Column(name = "nom_entreprise", length = 150)
+    private String nomEntreprise;
+
+    @Column(name = "telephone_entreprise", length = 30)
+    private String telephoneEntreprise;
+
+    @Column(name = "email_entreprise", length = 180)
+    private String emailEntreprise;
+
+    @Column(name = "adresse_entreprise", length = 255)
+    private String adresseEntreprise;
+
+    @Column(name = "plan_uuid")
+    private UUID planUuid;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "onboarding_status", nullable = false, length = 20)
     private OnboardingStatus onboardingStatus = OnboardingStatus.EN_COURS;

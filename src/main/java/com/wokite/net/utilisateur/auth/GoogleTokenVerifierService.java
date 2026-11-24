@@ -6,6 +6,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.wokite.net.shared.security.GoogleAuthProperties;
 import com.wokite.net.utilisateur.auth.exception.GoogleTokenInvalideException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -15,6 +16,10 @@ public class GoogleTokenVerifierService {
 
     private final GoogleIdTokenVerifier verifier;
 
+    @SuppressFBWarnings(
+            value = "CT_CONSTRUCTOR_THROW",
+            justification = "Une configuration Google invalide doit empêcher le démarrage de l'application."
+    )
     public GoogleTokenVerifierService(GoogleAuthProperties properties) {
 
         if (properties.clientId() == null || properties.clientId().isBlank()) {

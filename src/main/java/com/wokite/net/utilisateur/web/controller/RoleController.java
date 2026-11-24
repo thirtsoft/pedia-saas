@@ -2,6 +2,7 @@ package com.wokite.net.utilisateur.web.controller;
 
 import com.wokite.net.utilisateur.application.dto.CreerRoleRequest;
 import com.wokite.net.utilisateur.application.dto.ModifierRoleRequest;
+import com.wokite.net.utilisateur.application.dto.RoleOnboardingResponse;
 import com.wokite.net.utilisateur.application.dto.RoleResponse;
 import com.wokite.net.utilisateur.application.service.RoleService;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -53,5 +55,10 @@ public class RoleController {
     public ResponseEntity<Void> desactiver(@PathVariable UUID uuid) {
         service.desactiver(uuid);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/onboarding")
+    public ResponseEntity<List<RoleOnboardingResponse>> rechercherRolesDisponiblesPourOnboarding() {
+        return ResponseEntity.ok(service.rechercherRolesDisponiblesPourOnboarding());
     }
 }
