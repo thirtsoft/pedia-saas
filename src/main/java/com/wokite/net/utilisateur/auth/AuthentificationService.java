@@ -1,14 +1,17 @@
 package com.wokite.net.utilisateur.auth;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.wokite.net.onboarding.application.dto.OnboardingResponse;
 import com.wokite.net.onboarding.application.service.OnboardingService;
 import com.wokite.net.shared.persistence.RecordStatus;
 import com.wokite.net.shared.security.AuthenticatedUser;
 import com.wokite.net.shared.security.JwtService;
+import com.wokite.net.utilisateur.auth.dto.GoogleLoginRequest;
 import com.wokite.net.utilisateur.auth.dto.InscriptionResponse;
 import com.wokite.net.utilisateur.auth.dto.InscrireUtilisateurRequest;
 import com.wokite.net.utilisateur.auth.dto.LoginRequest;
 import com.wokite.net.utilisateur.auth.dto.LoginResponse;
+import com.wokite.net.utilisateur.auth.exception.GoogleAccountConflictException;
 import com.wokite.net.utilisateur.auth.exception.IdentifiantsInvalidesException;
 import com.wokite.net.utilisateur.domain.exception.UtilisateurEmailAlreadyExistsException;
 import com.wokite.net.utilisateur.domain.model.ProviderAuthentification;
@@ -28,17 +31,20 @@ public class AuthentificationService {
     private final PasswordEncoder encoder;
     private final OnboardingService onboardingService;
     private final JwtService jwtService;
+    private final GoogleTokenVerifierService googleTokenVerifierService;
 
     public AuthentificationService(
             UtilisateurRepository users,
             PasswordEncoder encoder,
             OnboardingService onboardingService,
-            JwtService jwtService) {
+            JwtService jwtService,
+            GoogleTokenVerifierService googleTokenVerifierService) {
 
         this.users = users;
         this.encoder = encoder;
         this.onboardingService = onboardingService;
         this.jwtService = jwtService;
+        this.googleTokenVerifierService = googleTokenVerifierService;
     }
 
     @Transactional
@@ -110,8 +116,80 @@ public class AuthentificationService {
         );
     }
 
+    @Transactional
+    public LoginResponse loginAvecGoogle(GoogleLoginRequest request) {
+
+        GoogleIdToken.Payload payload = googleTokenVerifierService.verifier(request.idToken());
+
+        String googleSubject = payload.getSubject();
+        String email = normaliserEmail(payload.getEmail());
+
+        Utilisateur utilisateur = users.findByGoogleSubject(googleSubject).orElse(null);
+
+        if (utilisateur == null) {
+
+            utilisateur = users.findByEmailIgnoreCase(email).orElse(null);
+
+            if (utilisateur != null) {
+                throw new GoogleAccountConflictException();
+            }
+
+            utilisateur = new Utilisateur();
+
+            utilisateur.setNom(valeurOuInconnu((String) payload.get("family_name")));
+            utilisateur.setPrenom(valeurOuInconnu((String) payload.get("given_name")));
+            utilisateur.setEmail(email);
+            utilisateur.setGoogleSubject(googleSubject);
+            utilisateur.setMotDePasse(null);
+            utilisateur.setProviderAuthentification(ProviderAuthentification.GOOGLE);
+            utilisateur.setEntrepriseUuid(null);
+            utilisateur.setRole(null);
+            utilisateur.setRecordStatus(RecordStatus.ACTIVE);
+
+            utilisateur = users.saveAndFlush(utilisateur);
+
+            onboardingService.creer(utilisateur.getUuid());
+        }
+
+        if (utilisateur.getRecordStatus() != RecordStatus.ACTIVE) {
+            throw new IdentifiantsInvalidesException();
+        }
+
+        String role = utilisateur.getRole() == null ? null : utilisateur.getRole().getCode();
+        Set<String> permissions = Set.of();
+
+        OnboardingResponse onboarding = onboardingService.rechercherParUtilisateur(utilisateur.getUuid());
+
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser(
+                utilisateur.getUuid(),
+                utilisateur.getEntrepriseUuid(),
+                role, permissions,
+                onboarding.onboardingStatus(),
+                onboarding.currentStep()
+        );
+
+        String token = jwtService.generateToken(authenticatedUser);
+
+        return new LoginResponse(
+                token, "Bearer",
+                authenticatedUser.utilisateurUuid(),
+                authenticatedUser.entrepriseUuid(),
+                authenticatedUser.role(),
+                authenticatedUser.permissions(),
+                authenticatedUser.onboardingStatus(),
+                authenticatedUser.onboardingStep()
+        );
+    }
+
     private String normaliserEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String valeurOuInconnu(String valeur) {
+        if (valeur == null || valeur.isBlank()) {
+            return "Utilisateur";
+        }
+        return valeur.trim();
     }
 
     private InscriptionResponse toInscriptionResponse(Utilisateur utilisateur) {

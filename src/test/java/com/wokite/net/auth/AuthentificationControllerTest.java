@@ -57,8 +57,7 @@ class AuthentificationControllerTest {
                 Instant.now()
         );
 
-        when(service.inscrire(any(InscrireUtilisateurRequest.class)))
-                .thenReturn(response);
+        when(service.inscrire(any(InscrireUtilisateurRequest.class))).thenReturn(response);
 
         mockMvc.perform(
                         post("/auth/register")
@@ -114,8 +113,7 @@ class AuthentificationControllerTest {
                 OnboardingStepCode.CHOIX_ROLE
         );
 
-        when(service.login(any(LoginRequest.class)))
-                .thenReturn(response);
+        when(service.login(any(LoginRequest.class))).thenReturn(response);
 
         mockMvc.perform(
                         post("/auth/login")
@@ -128,22 +126,14 @@ class AuthentificationControllerTest {
                                         """)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token")
-                        .value("jwt-token"))
-                .andExpect(jsonPath("$.type")
-                        .value("Bearer"))
-                .andExpect(jsonPath("$.utilisateurUuid")
-                        .value(utilisateurUuid.toString()))
-                .andExpect(jsonPath("$.entrepriseUuid")
-                        .value(entrepriseUuid.toString()))
-                .andExpect(jsonPath("$.role")
-                        .value("MEDECIN"))
-                .andExpect(jsonPath("$.permissions[0]")
-                        .value("PATIENT_READ"))
-                .andExpect(jsonPath("$.onboardingStatus")
-                        .value("EN_COURS"))
-                .andExpect(jsonPath("$.onboardingStep")
-                        .value("CHOIX_ROLE"));
+                .andExpect(jsonPath("$.token").value("jwt-token"))
+                .andExpect(jsonPath("$.type").value("Bearer"))
+                .andExpect(jsonPath("$.utilisateurUuid").value(utilisateurUuid.toString()))
+                .andExpect(jsonPath("$.entrepriseUuid").value(entrepriseUuid.toString()))
+                .andExpect(jsonPath("$.role").value("MEDECIN"))
+                .andExpect(jsonPath("$.permissions[0]").value("PATIENT_READ"))
+                .andExpect(jsonPath("$.onboardingStatus").value("EN_COURS"))
+                .andExpect(jsonPath("$.onboardingStep").value("CHOIX_ROLE"));
     }
 
     @Test

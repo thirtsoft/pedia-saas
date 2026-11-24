@@ -1,5 +1,6 @@
 package com.wokite.net.utilisateur.auth;
 
+import com.wokite.net.utilisateur.auth.dto.GoogleLoginRequest;
 import com.wokite.net.utilisateur.auth.dto.InscriptionResponse;
 import com.wokite.net.utilisateur.auth.dto.InscrireUtilisateurRequest;
 import com.wokite.net.utilisateur.auth.dto.LoginRequest;
@@ -31,5 +32,10 @@ public class AuthentificationController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(service.login(request));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<LoginResponse> loginAvecGoogle(@Valid @RequestBody GoogleLoginRequest request) {
+        return ResponseEntity.ok(service.loginAvecGoogle(request));
     }
 }
