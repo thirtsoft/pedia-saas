@@ -18,6 +18,7 @@ import com.wokite.net.onboarding.domain.model.OnboardingStepCode;
 import com.wokite.net.onboarding.domain.model.RoleOnboardingCode;
 import com.wokite.net.onboarding.domain.repository.OnboardingRepository;
 import com.wokite.net.shared.security.service.CommonService;
+import com.wokite.net.shared.tenant.TenantContext;
 import com.wokite.net.shared.web.error.BusinessException;
 import com.wokite.net.shared.web.error.ErrorCode;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,13 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class OnboardingService {
 
-    private static final String ROLE_MEDECIN_INDEPENDANT = RoleOnboardingCode.MEDECIN_INDEPENDANT.name();
-    private static final String ROLE_ADMIN_CABINET = RoleOnboardingCode.ADMIN_CABINET.name();
+    private static final String ROLE_MEDECIN_INDEPENDANT =
+            RoleOnboardingCode.MEDECIN_INDEPENDANT.name();
+
+    private static final String ROLE_ADMIN_CABINET =
+            RoleOnboardingCode.ADMIN_CABINET.name();
+
+    private static final String ROLE_CABINET = "CABINET";
 
     private final OnboardingRepository onboardings;
     private final CommonService commonService;
@@ -50,8 +56,8 @@ public class OnboardingService {
             EntrepriseExternalService entrepriseExternalService,
             UtilisateurExternalService utilisateurExternalService,
             PlanAbonnementExternalService planAbonnementExternalService,
-            AbonnementExternalService abonnementExternalService) {
-
+            AbonnementExternalService abonnementExternalService
+    ) {
         this.onboardings = onboardings;
         this.commonService = commonService;
         this.roleExternalService = roleExternalService;
@@ -67,12 +73,14 @@ public class OnboardingService {
                 .map(this::toResponse)
                 .orElseGet(() -> {
                     Instant now = Instant.now();
+
                     Onboarding onboarding = new Onboarding();
                     onboarding.setUtilisateurUuid(utilisateurUuid);
                     onboarding.setOnboardingStatus(OnboardingStatus.EN_COURS);
                     onboarding.setCurrentStep(OnboardingStepCode.CHOIX_ROLE);
                     onboarding.setStartedAt(now);
                     onboarding.setLastActivityAt(now);
+
                     return toResponse(onboardings.save(onboarding));
                 });
     }
@@ -82,7 +90,10 @@ public class OnboardingService {
     }
 
     @Transactional
-    public OnboardingResponse mettreAJourEtape(UUID utilisateurUuid, OnboardingStepCode stepCode) {
+    public OnboardingResponse mettreAJourEtape(
+            UUID utilisateurUuid,
+            OnboardingStepCode stepCode
+    ) {
         Onboarding onboarding = trouverParUtilisateur(utilisateurUuid);
 
         if (onboarding.getOnboardingStatus() == OnboardingStatus.TERMINE) {
@@ -100,8 +111,10 @@ public class OnboardingService {
 
     @Deprecated
     @Transactional
-    public OnboardingResponse terminer(UUID utilisateurUuid, UUID entrepriseUuid) {
-
+    public OnboardingResponse terminer(
+            UUID utilisateurUuid,
+            UUID entrepriseUuid
+    ) {
         Onboarding onboarding = trouverParUtilisateur(utilisateurUuid);
 
         Instant now = Instant.now();
@@ -119,8 +132,11 @@ public class OnboardingService {
 
     @Transactional
     public OnboardingResponse enregistrerErreur(
-            UUID utilisateurUuid, OnboardingStepCode stepCode, String errorCode, String errorMessage) {
-
+            UUID utilisateurUuid,
+            OnboardingStepCode stepCode,
+            String errorCode,
+            String errorMessage
+    ) {
         Onboarding onboarding = trouverParUtilisateur(utilisateurUuid);
 
         onboarding.setCurrentStep(stepCode);
@@ -134,7 +150,6 @@ public class OnboardingService {
 
     @Transactional
     public OnboardingResponse abandonner(UUID utilisateurUuid) {
-
         Onboarding onboarding = trouverParUtilisateur(utilisateurUuid);
 
         onboarding.setOnboardingStatus(OnboardingStatus.ABANDONNE);
@@ -150,17 +165,16 @@ public class OnboardingService {
 
     @Transactional
     public OnboardingResponse choisirRole(OnboardingRoleRequest request) {
+
         UUID utilisateurUuid = commonService.getCurrentUserUuid();
 
         Onboarding onboarding = trouverParUtilisateur(utilisateurUuid);
 
         verifierOnboardingModifiable(onboarding);
-
         verifierEtapeCourante(onboarding, OnboardingStepCode.CHOIX_ROLE);
 
-        RoleExternalService.RoleOnboardingInfo role = roleExternalService.rechercherRoleDisponible(
-                request.roleUuid()
-        );
+        RoleExternalService.RoleOnboardingInfo role =
+                roleExternalService.rechercherRoleDisponible(request.roleUuid());
 
         if (role == null) {
             throw new BusinessException(
@@ -187,15 +201,19 @@ public class OnboardingService {
     }
 
     @Transactional
-    public OnboardingResponse renseignerEntreprise(OnboardingEntrepriseRequest request) {
+    public OnboardingResponse renseignerEntreprise(
+            OnboardingEntrepriseRequest request
+    ) {
 
         UUID utilisateurUuid = commonService.getCurrentUserUuid();
 
         Onboarding onboarding = trouverParUtilisateur(utilisateurUuid);
 
         verifierOnboardingModifiable(onboarding);
-
-        verifierEtapeCourante(onboarding, OnboardingStepCode.INFORMATIONS_ENTREPRISE);
+        verifierEtapeCourante(
+                onboarding,
+                OnboardingStepCode.INFORMATIONS_ENTREPRISE
+        );
 
         if (onboarding.getRoleUuid() == null) {
             throw new BusinessException(
@@ -204,9 +222,10 @@ public class OnboardingService {
             );
         }
 
-        RoleExternalService.RoleOnboardingInfo role = roleExternalService.rechercherRoleDisponible(
-                onboarding.getRoleUuid()
-        );
+        RoleExternalService.RoleOnboardingInfo role =
+                roleExternalService.rechercherRoleDisponible(
+                        onboarding.getRoleUuid()
+                );
 
         if (role == null) {
             throw new BusinessException(
@@ -217,8 +236,12 @@ public class OnboardingService {
 
         onboarding.setNomEntreprise(request.nom().trim());
         onboarding.setTelephoneEntreprise(request.telephone().trim());
-        onboarding.setEmailEntreprise(normaliserNullable(request.email()));
-        onboarding.setAdresseEntreprise(normaliserNullable(request.adresse()));
+        onboarding.setEmailEntreprise(
+                normaliserNullable(request.email())
+        );
+        onboarding.setAdresseEntreprise(
+                normaliserNullable(request.adresse())
+        );
 
         onboarding.setCurrentStep(OnboardingStepCode.CHOIX_PLAN);
         onboarding.setOnboardingStatus(OnboardingStatus.EN_COURS);
@@ -230,19 +253,24 @@ public class OnboardingService {
     }
 
     @Transactional
-    public OnboardingResponse choisirPlan(OnboardingPlanRequest request) {
+    public OnboardingResponse choisirPlan(
+            OnboardingPlanRequest request
+    ) {
 
         UUID utilisateurUuid = commonService.getCurrentUserUuid();
 
         Onboarding onboarding = trouverParUtilisateur(utilisateurUuid);
 
         verifierOnboardingModifiable(onboarding);
-
-        verifierEtapeCourante(onboarding, OnboardingStepCode.CHOIX_PLAN);
-
-        PlanAbonnementExternalService.PlanOnboardingInfo plan = planAbonnementExternalService.rechercherPlanDisponible(
-                request.planUuid()
+        verifierEtapeCourante(
+                onboarding,
+                OnboardingStepCode.CHOIX_PLAN
         );
+
+        PlanAbonnementExternalService.PlanOnboardingInfo plan =
+                planAbonnementExternalService.rechercherPlanDisponible(
+                        request.planUuid()
+                );
 
         if (plan == null) {
             throw new BusinessException(
@@ -268,12 +296,12 @@ public class OnboardingService {
         Onboarding onboarding = trouverParUtilisateur(utilisateurUuid);
 
         verifierOnboardingModifiable(onboarding);
-
         verifierDonneesCompletesPourRecapitulatif(onboarding);
 
-        RoleExternalService.RoleOnboardingInfo role = roleExternalService.rechercherRoleDisponible(
-                onboarding.getRoleUuid()
-        );
+        RoleExternalService.RoleOnboardingInfo role =
+                roleExternalService.rechercherRoleDisponible(
+                        onboarding.getRoleUuid()
+                );
 
         if (role == null) {
             throw new BusinessException(
@@ -282,9 +310,10 @@ public class OnboardingService {
             );
         }
 
-        PlanAbonnementExternalService.PlanOnboardingInfo plan = planAbonnementExternalService.rechercherPlanDisponible(
-                onboarding.getPlanUuid()
-        );
+        PlanAbonnementExternalService.PlanOnboardingInfo plan =
+                planAbonnementExternalService.rechercherPlanDisponible(
+                        onboarding.getPlanUuid()
+                );
 
         if (plan == null) {
             throw new BusinessException(
@@ -293,18 +322,19 @@ public class OnboardingService {
             );
         }
 
-        List<OnboardingRecapitulatifFonctionnaliteResponse> fonctionnalites = planAbonnementExternalService
-                .rechercherFonctionnalites(plan.uuid())
-                .stream()
-                .map(fonctionnalite ->
-                        new OnboardingRecapitulatifFonctionnaliteResponse(
-                                fonctionnalite.uuid(),
-                                fonctionnalite.code(),
-                                fonctionnalite.nom(),
-                                fonctionnalite.description()
+        List<OnboardingRecapitulatifFonctionnaliteResponse> fonctionnalites =
+                planAbonnementExternalService
+                        .rechercherFonctionnalites(plan.uuid())
+                        .stream()
+                        .map(fonctionnalite ->
+                                new OnboardingRecapitulatifFonctionnaliteResponse(
+                                        fonctionnalite.uuid(),
+                                        fonctionnalite.code(),
+                                        fonctionnalite.nom(),
+                                        fonctionnalite.description()
+                                )
                         )
-                )
-                .toList();
+                        .toList();
 
         return new OnboardingRecapitulatifResponse(
                 role.uuid(),
@@ -333,9 +363,10 @@ public class OnboardingService {
         verifierOnboardingModifiable(onboarding);
         verifierDonneesCompletesPourFinalisation(onboarding);
 
-        RoleExternalService.RoleOnboardingInfo role = roleExternalService.rechercherRoleDisponible(
-                onboarding.getRoleUuid()
-        );
+        RoleExternalService.RoleOnboardingInfo role =
+                roleExternalService.rechercherRoleDisponible(
+                        onboarding.getRoleUuid()
+                );
 
         if (role == null) {
             throw new BusinessException(
@@ -344,9 +375,10 @@ public class OnboardingService {
             );
         }
 
-        PlanAbonnementExternalService.PlanOnboardingInfo plan = planAbonnementExternalService.rechercherPlanDisponible(
-                onboarding.getPlanUuid()
-        );
+        PlanAbonnementExternalService.PlanOnboardingInfo plan =
+                planAbonnementExternalService.rechercherPlanDisponible(
+                        onboarding.getPlanUuid()
+                );
 
         if (plan == null) {
             throw new BusinessException(
@@ -357,19 +389,27 @@ public class OnboardingService {
 
         String typeEntreprise = determinerTypeEntreprise(role.code());
 
-        EntrepriseExternalService.EntrepriseOnboardingInfo entreprise = entrepriseExternalService.creer(
-                onboarding.getNomEntreprise(),
-                onboarding.getTelephoneEntreprise(),
-                onboarding.getEmailEntreprise(),
-                onboarding.getAdresseEntreprise(),
-                typeEntreprise
-        );
+        EntrepriseExternalService.EntrepriseOnboardingInfo entreprise =
+                entrepriseExternalService.creer(
+                        onboarding.getNomEntreprise(),
+                        onboarding.getTelephoneEntreprise(),
+                        onboarding.getEmailEntreprise(),
+                        onboarding.getAdresseEntreprise(),
+                        typeEntreprise
+                );
 
-        utilisateurExternalService.rattacherEntreprise(utilisateurUuid, entreprise.uuid());
+        try {
+            TenantContext.setTenantUuid(entreprise.uuid());
 
-        utilisateurExternalService.affecterRole(utilisateurUuid, role.uuid());
+            utilisateurExternalService.rattacherEntreprise(utilisateurUuid, entreprise.uuid());
 
-        abonnementExternalService.creerEssai(entreprise.uuid(), plan.uuid(), LocalDate.now());
+            utilisateurExternalService.affecterRole(utilisateurUuid, role.uuid());
+
+            abonnementExternalService.creerEssai(entreprise.uuid(), plan.uuid(), LocalDate.now());
+
+        } finally {
+            TenantContext.clear();
+        }
 
         Instant now = Instant.now();
 
@@ -385,6 +425,7 @@ public class OnboardingService {
     }
 
     private void verifierOnboardingModifiable(Onboarding onboarding) {
+
         if (onboarding.getOnboardingStatus() == OnboardingStatus.TERMINE) {
             throw new BusinessException(
                     ErrorCode.BUSINESS_ERROR,
@@ -400,7 +441,10 @@ public class OnboardingService {
         }
     }
 
-    private void verifierEtapeCourante(Onboarding onboarding, OnboardingStepCode expectedStep) {
+    private void verifierEtapeCourante(
+            Onboarding onboarding,
+            OnboardingStepCode expectedStep
+    ) {
 
         if (onboarding.getCurrentStep() != expectedStep) {
             throw new BusinessException(
@@ -410,7 +454,9 @@ public class OnboardingService {
         }
     }
 
-    private void verifierDonneesCompletesPourRecapitulatif(Onboarding onboarding) {
+    private void verifierDonneesCompletesPourRecapitulatif(
+            Onboarding onboarding
+    ) {
 
         if (onboarding.getRoleUuid() == null) {
             throw new BusinessException(
@@ -440,15 +486,21 @@ public class OnboardingService {
             );
         }
 
-        verifierEtapeCourante(onboarding, OnboardingStepCode.VALIDATION);
+        verifierEtapeCourante(
+                onboarding,
+                OnboardingStepCode.VALIDATION
+        );
     }
 
-    private void verifierDonneesCompletesPourFinalisation(Onboarding onboarding) {
+    private void verifierDonneesCompletesPourFinalisation(
+            Onboarding onboarding
+    ) {
         verifierDonneesCompletesPourRecapitulatif(onboarding);
     }
 
     private boolean isRoleOnboardingAutorise(String roleCode) {
-        return ROLE_MEDECIN_INDEPENDANT.equals(roleCode) || ROLE_ADMIN_CABINET.equals(roleCode);
+        return ROLE_MEDECIN_INDEPENDANT.equals(roleCode)
+                || ROLE_ADMIN_CABINET.equals(roleCode);
     }
 
     private String determinerTypeEntreprise(String roleCode) {
@@ -467,12 +519,11 @@ public class OnboardingService {
         );
     }
 
-    private static final String ROLE_CABINET = "CABINET";
-
     private Onboarding trouverParUtilisateur(UUID utilisateurUuid) {
-        return onboardings.findByUtilisateurUuid(utilisateurUuid).orElseThrow(() ->
-                new OnboardingNotFoundException(utilisateurUuid)
-        );
+        return onboardings.findByUtilisateurUuid(utilisateurUuid)
+                .orElseThrow(() ->
+                        new OnboardingNotFoundException(utilisateurUuid)
+                );
     }
 
     private OnboardingResponse toResponse(Onboarding onboarding) {
@@ -494,7 +545,9 @@ public class OnboardingService {
         if (value == null) {
             return null;
         }
+
         String normalized = value.trim();
+
         return normalized.isBlank() ? null : normalized;
     }
 

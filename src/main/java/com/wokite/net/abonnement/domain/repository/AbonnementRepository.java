@@ -12,7 +12,13 @@ public interface AbonnementRepository extends JpaRepository<Abonnement, Long> {
 
     Optional<Abonnement> findByUuid(UUID uuid);
 
-    boolean existsByEntrepriseUuidAndStatutAbonnementIn(UUID entrepriseUuid, Collection<StatutAbonnement> statuts);
+    boolean existsByEntrepriseUuidAndStatutAbonnementIn(
+            UUID entrepriseUuid, Collection<StatutAbonnement> statuts
+    );
 
-    Optional<Abonnement> findFirstByEntrepriseUuidAndStatutAbonnementInOrderByDateDebutDesc(UUID entrepriseUuid, Collection<StatutAbonnement> statuts);
+    Optional<Abonnement> findFirstByEntrepriseUuidAndStatutAbonnementInOrderByDateDebutDesc(
+            UUID entrepriseUuid, Collection<StatutAbonnement> statuts
+    );
+
+    boolean existsByEntrepriseUuidAndPlanAbonnementUuid(UUID entrepriseUuid, UUID planUuid);
 }

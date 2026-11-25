@@ -22,7 +22,7 @@ public class AbonnementExternalServiceImpl implements AbonnementExternalService 
     public AbonnementOnboardingInfo creerEssai(UUID entrepriseUuid, UUID planUuid, LocalDate dateDebut) {
 
         AbonnementResponse abonnement = abonnementService.creer(
-                new CreerAbonnementRequest(entrepriseUuid, planUuid, dateDebut)
+                new CreerAbonnementRequest(planUuid, dateDebut)
         );
 
         return new AbonnementOnboardingInfo(

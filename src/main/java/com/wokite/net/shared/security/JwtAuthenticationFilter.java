@@ -1,6 +1,7 @@
 package com.wokite.net.shared.security;
 
 
+import com.wokite.net.shared.tenant.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +23,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
 
         String authorization = request.getHeader("Authorization");
@@ -35,7 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authorization.substring(7);
 
         try {
-
             AuthenticatedUser user = jwtService.parseUser(token);
 
             AuthenticatedPrincipal principal = new AuthenticatedPrincipal(user);
@@ -46,10 +48,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        } catch (Exception ignored) {
-            SecurityContextHolder.clearContext();
-        }
+            if (user.entrepriseUuid() != null) {
+                TenantContext.setTenantUuid(user.entrepriseUuid());
+            }
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+
+        } catch (Exception ignored) {
+
+            SecurityContextHolder.clearContext();
+
+            filterChain.doFilter(request, response);
+
+        } finally {
+
+            TenantContext.clear();
+        }
     }
 }

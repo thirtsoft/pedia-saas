@@ -1,6 +1,6 @@
 package com.wokite.net.abonnement.domain.model;
 
-import com.wokite.net.shared.persistence.BaseEntity;
+import com.wokite.net.shared.persistence.TenantAwareEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 @Table(name = "abonnement")
@@ -23,10 +22,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Abonnement extends BaseEntity {
-
-    @Column(name = "entreprise_uuid", nullable = false)
-    private UUID entrepriseUuid;
+public class Abonnement extends TenantAwareEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "plan_abonnement_id", nullable = false)
@@ -41,6 +37,4 @@ public class Abonnement extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "statut_abonnement", nullable = false, length = 30)
     private StatutAbonnement statutAbonnement;
-
-
 }

@@ -38,10 +38,10 @@ public class AbonnementController {
         return service.rechercher(uuid);
     }
 
-    @GetMapping("/entreprise/{entrepriseUuid}/actif")
-    public AbonnementResponse rechercherActif(@PathVariable UUID entrepriseUuid) {
-        return service.rechercherActif(entrepriseUuid);
-    }
+//    @GetMapping("/entreprise/{entrepriseUuid}/actif")
+//    public AbonnementResponse rechercherActif(@PathVariable UUID entrepriseUuid) {
+//        return service.rechercherActif(entrepriseUuid);
+//    }
 
     @PatchMapping("/{uuid}/statut")
     public AbonnementResponse modifierStatut(@PathVariable UUID uuid, @Valid @RequestBody ModifierStatutAbonnementRequest request) {
