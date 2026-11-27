@@ -3,6 +3,8 @@ package com.wokite.net.utilisateur.domain.model;
 import com.wokite.net.shared.persistence.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,5 +24,9 @@ public class Role extends BaseEntity {
 
     @Column(name = "libelle", nullable = false, length = 100)
     private String libelle;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_role", nullable = false, length = 30,  updatable = false)
+    private TypeRole typeRole;
 
 }

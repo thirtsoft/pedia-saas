@@ -15,6 +15,7 @@ import com.wokite.net.utilisateur.auth.exception.GoogleAccountConflictException;
 import com.wokite.net.utilisateur.auth.exception.IdentifiantsInvalidesException;
 import com.wokite.net.utilisateur.domain.exception.UtilisateurEmailAlreadyExistsException;
 import com.wokite.net.utilisateur.domain.model.ProviderAuthentification;
+import com.wokite.net.utilisateur.domain.model.TypeRole;
 import com.wokite.net.utilisateur.domain.model.Utilisateur;
 import com.wokite.net.utilisateur.domain.repository.UtilisateurRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -91,6 +92,8 @@ public class AuthentificationService {
 
         String role = utilisateur.getRole() == null ? null : utilisateur.getRole().getCode();
 
+        TypeRole typeRole = utilisateur.getRole() == null ? null : utilisateur.getRole().getTypeRole();
+
         Set<String> permissions = Set.of();
 
         OnboardingResponse onboarding = onboardingService.rechercherParUtilisateur(utilisateur.getUuid());
@@ -110,6 +113,7 @@ public class AuthentificationService {
                 authenticatedUser.utilisateurUuid(),
                 authenticatedUser.entrepriseUuid(),
                 authenticatedUser.role(),
+                typeRole,
                 authenticatedUser.permissions(),
                 authenticatedUser.onboardingStatus(),
                 authenticatedUser.onboardingStep()
@@ -156,6 +160,7 @@ public class AuthentificationService {
         }
 
         String role = utilisateur.getRole() == null ? null : utilisateur.getRole().getCode();
+        TypeRole typeRole = utilisateur.getRole() == null ? null : utilisateur.getRole().getTypeRole();
         Set<String> permissions = Set.of();
 
         OnboardingResponse onboarding = onboardingService.rechercherParUtilisateur(utilisateur.getUuid());
@@ -175,6 +180,7 @@ public class AuthentificationService {
                 authenticatedUser.utilisateurUuid(),
                 authenticatedUser.entrepriseUuid(),
                 authenticatedUser.role(),
+                typeRole,
                 authenticatedUser.permissions(),
                 authenticatedUser.onboardingStatus(),
                 authenticatedUser.onboardingStep()

@@ -45,12 +45,8 @@ public class OnboardingController {
     }
 
     @PutMapping("/entreprise")
-    public ResponseEntity<OnboardingResponse> renseignerEntreprise(
-            @Valid @RequestBody OnboardingEntrepriseRequest request) {
-
-        return ResponseEntity.ok(
-                service.renseignerEntreprise(request)
-        );
+    public ResponseEntity<OnboardingResponse> renseignerEntreprise(@Valid @RequestBody OnboardingEntrepriseRequest request) {
+        return ResponseEntity.ok(service.renseignerEntreprise(request));
     }
 
     @PutMapping("/plan")

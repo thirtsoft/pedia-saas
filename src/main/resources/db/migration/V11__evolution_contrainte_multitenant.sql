@@ -8,3 +8,19 @@ CREATE UNIQUE INDEX uk_abonnement_entreprise_encours
         'ACTIF',
         'SUSPENDU'
     );
+
+ALTER TABLE role
+    ADD COLUMN type_role VARCHAR(30);
+
+UPDATE role
+SET type_role = 'CABINET'
+WHERE code IN (
+               'ADMIN_CABINET',
+               'COMPTABLE',
+               'SECRETAIRE',
+               'MEDECIN'
+    );
+
+UPDATE role
+SET type_role = 'MEDECIN_INDEPENDANT'
+WHERE code = 'MEDECIN_INDEPENDANT';

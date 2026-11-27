@@ -38,6 +38,7 @@ public class RoleService {
         Role e = new Role();
         e.setCode(c);
         e.setLibelle(r.libelle().trim());
+        e.setTypeRole(r.typeRole());
         e.setRecordStatus(RecordStatus.ACTIVE);
         return toResponse(repository.save(e));
     }
@@ -73,6 +74,6 @@ public class RoleService {
     }
 
     private RoleResponse toResponse(Role e) {
-        return new RoleResponse(e.getUuid(), e.getCode(), e.getLibelle(), e.getRecordStatus(), e.getCreatedAt(), e.getUpdatedAt());
+        return new RoleResponse(e.getUuid(), e.getCode(), e.getLibelle(), e.getTypeRole(), e.getRecordStatus(), e.getCreatedAt(), e.getUpdatedAt());
     }
 }

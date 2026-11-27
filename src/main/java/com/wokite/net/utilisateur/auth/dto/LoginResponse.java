@@ -2,6 +2,7 @@ package com.wokite.net.utilisateur.auth.dto;
 
 import com.wokite.net.onboarding.domain.model.OnboardingStatus;
 import com.wokite.net.onboarding.domain.model.OnboardingStepCode;
+import com.wokite.net.utilisateur.domain.model.TypeRole;
 
 import java.util.Set;
 import java.util.UUID;
@@ -12,6 +13,7 @@ public record LoginResponse(
         UUID utilisateurUuid,
         UUID entrepriseUuid,
         String role,
+        TypeRole typeRole,
         Set<String> permissions,
         OnboardingStatus onboardingStatus,
         OnboardingStepCode onboardingStep
