@@ -8,6 +8,7 @@ import com.wokite.net.shared.web.error.GlobalExceptionHandler;
 import com.wokite.net.utilisateur.application.dto.CreerRoleRequest;
 import com.wokite.net.utilisateur.application.dto.RoleResponse;
 import com.wokite.net.utilisateur.application.service.RoleService;
+import com.wokite.net.utilisateur.domain.model.TypeRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -42,7 +43,7 @@ class RoleControllerTest {
     @WithMockUser
     void shouldCreateRole() throws Exception {
         UUID u = UUID.randomUUID();
-        when(service.creer(any(CreerRoleRequest.class))).thenReturn(new RoleResponse(u, "MEDECIN", "Médecin", RecordStatus.ACTIVE, null, null));
-        mockMvc.perform(post("/roles").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(new CreerRoleRequest("MEDECIN", "Médecin")))).andExpect(status().isCreated()).andExpect(jsonPath("$.code").value("MEDECIN"));
+        when(service.creer(any(CreerRoleRequest.class))).thenReturn(new RoleResponse(u, "MEDECIN", "Médecin", TypeRole.MEDECIN_INDEPENDANT, RecordStatus.ACTIVE, null, null));
+        mockMvc.perform(post("/roles").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(new CreerRoleRequest("MEDECIN", "Médecin", TypeRole.MEDECIN_INDEPENDANT)))).andExpect(status().isCreated()).andExpect(jsonPath("$.code").value("MEDECIN"));
     }
 }

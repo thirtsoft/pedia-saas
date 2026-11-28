@@ -12,6 +12,7 @@ import com.wokite.net.utilisateur.auth.dto.InscrireUtilisateurRequest;
 import com.wokite.net.utilisateur.auth.dto.LoginRequest;
 import com.wokite.net.utilisateur.auth.dto.LoginResponse;
 import com.wokite.net.utilisateur.domain.model.ProviderAuthentification;
+import com.wokite.net.utilisateur.domain.model.TypeRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -108,6 +109,7 @@ class AuthentificationControllerTest {
                 utilisateurUuid,
                 entrepriseUuid,
                 "MEDECIN",
+                TypeRole.MEDECIN_INDEPENDANT,
                 Set.of("PATIENT_READ"),
                 OnboardingStatus.EN_COURS,
                 OnboardingStepCode.CHOIX_ROLE

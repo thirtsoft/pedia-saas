@@ -62,7 +62,6 @@ public class AbonnementService {
 
         Abonnement abonnement = new Abonnement();
 
-        abonnement.setEntrepriseUuid(entrepriseUuid);
         abonnement.setPlanAbonnement(plan);
         abonnement.setDateDebut(request.dateDebut());
         abonnement.setDateFin(request.dateDebut().plusDays(DUREE_ESSAI_JOURS));

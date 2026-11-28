@@ -24,4 +24,8 @@ public record OnboardingRecapitulatifResponse(
         List<OnboardingRecapitulatifFonctionnaliteResponse> fonctionnalites
 
 ) {
+    public OnboardingRecapitulatifResponse {
+        fonctionnalites = fonctionnalites == null
+                ? List.of() : List.copyOf(fonctionnalites);
+    }
 }

@@ -3,6 +3,7 @@ package com.wokite.net.utilisateur.application.service;
 import com.wokite.net.utilisateur.application.dto.CreerRoleRequest;
 import com.wokite.net.utilisateur.domain.exception.RoleCodeAlreadyExistsException;
 import com.wokite.net.utilisateur.domain.model.Role;
+import com.wokite.net.utilisateur.domain.model.TypeRole;
 import com.wokite.net.utilisateur.domain.repository.RoleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class RoleServiceTest {
         saved.setCode("MEDECIN");
         saved.setLibelle("Médecin");
         when(repo.save(any(Role.class))).thenReturn(saved);
-        var r = service.creer(new CreerRoleRequest("medecin", "Médecin"));
+        var r = service.creer(new CreerRoleRequest("medecin", "Médecin", TypeRole.MEDECIN_INDEPENDANT));
         assertThat(r.code()).isEqualTo("MEDECIN");
         verify(repo).save(any(Role.class));
     }
@@ -43,7 +44,7 @@ class RoleServiceTest {
     @Test
     void shouldRejectDuplicate() {
         when(repo.existsByCode("MEDECIN")).thenReturn(true);
-        assertThatThrownBy(() -> service.creer(new CreerRoleRequest("MEDECIN", "Médecin"))).isInstanceOf(RoleCodeAlreadyExistsException.class);
+        assertThatThrownBy(() -> service.creer(new CreerRoleRequest("MEDECIN", "Médecin", TypeRole.MEDECIN_INDEPENDANT))).isInstanceOf(RoleCodeAlreadyExistsException.class);
         verify(repo, never()).save(any(Role.class));
     }
 }

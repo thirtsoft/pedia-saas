@@ -8,7 +8,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
@@ -16,7 +15,6 @@ import org.hibernate.annotations.ParamDef;
 import java.util.UUID;
 
 @Getter
-@Setter
 @MappedSuperclass
 @FilterDef(
         name = "tenantScope",

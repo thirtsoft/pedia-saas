@@ -13,4 +13,9 @@ public record PlanAbonnementOnbordingResponse(
         Integer nombreUtilisateursMax,
         List<FonctionnalitePlanResponse> fonctionnalites
 ) {
+
+    public PlanAbonnementOnbordingResponse {
+        fonctionnalites = fonctionnalites == null
+                ? List.of() : List.copyOf(fonctionnalites);
+    }
 }
